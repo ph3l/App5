@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="App5.MainPage">
+
+    <StackLayout Margin="40">
+        <Button Text="Save Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="saveBtn" />
+        <Button Text="Delete Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="deleteBtn" />
+        <Button Text="Show Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="showBtn" />
+        <ListView x:Name="TideInformationListView"
+                      ItemsSource="{Binding Contacts}"
+                      BackgroundColor="#F0ECEC"
+                      SelectionMode="None" 
+                      Footer="">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal" Margin="0,10">
+                            <Label  Text="{Binding Date}"      FontSize="15" />
+                            <Label  Text="{Binding firstLowTide}"  FontSize="15" />
+                            <Label  Text="{Binding firstHighTide}" FontSize="15" />
+                            <Label  Text="{Binding secondLowTide}"  FontSize="15" />
+                            <Label  Text="{Binding secondHighTide}" FontSize="15" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+
+</ContentPage>
