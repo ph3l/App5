@@ -9,7 +9,7 @@ namespace App5
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        public string Date { get; set; }
+        public string date { get; set; }
         public string firstLowTide { get; set; }
         public string firstHighTide { get; set; }
         public string secondLowTide { get; set; }

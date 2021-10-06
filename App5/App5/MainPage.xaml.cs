@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Net.Http;
+using System.Globalization;
 
 //adb connect 127.0.0.1:5555
 
@@ -51,27 +52,27 @@ namespace App5
 
                 await App.Database.SaveTideAsync(new TideInformation
                 {
-                    // Date = *******Fix this part***********, 
+                    date = myResult.Item1, 
                     // check if the date already exist
 
-                    firstLowTide = myResult.Item1,
-                    firstHighTide = myResult.Item2,
-                    secondLowTide = myResult.Item3,
-                    secondHighTide = myResult.Item4
+                    firstLowTide = myResult.Item2,
+                    firstHighTide = myResult.Item3,
+                    secondLowTide = myResult.Item4,
+                    secondHighTide = myResult.Item5
                 });
 
             }
         }
 
 
-        public static Tuple<string, string, string, string> getTideData(string todaysDate) // make this so you can set the day here
+        public static Tuple<string, string, string, string, string> getTideData(string todaysDate) // make this so you can set the day here
         {
             // get the current date and its associated tide times [x]
             // get the data for the next 5 days and store in sqlite [x]
             // Todays date
             // 1 = today, 2 = tomorrow
-            string firstLowTide, firstHighTide, secondLowTide, secondHighTide;
-            firstLowTide = firstHighTide = secondLowTide = secondHighTide = string.Empty;
+            string date, firstLowTide, firstHighTide, secondLowTide, secondHighTide;
+            date = firstLowTide = firstHighTide = secondLowTide = secondHighTide = string.Empty;
 
             var url = @"https://tides.willyweather.com.au/qld/sunshine-coast/ocean-beach.html";
             HtmlWeb web = new HtmlWeb();
@@ -92,20 +93,32 @@ namespace App5
             {
                 tideResults.Add(item.InnerText);
             }
-            // Part 2: call Regex.Match.
+            // get the 4 time interval
             string str = tideResults[2];
-            string[] result =
+            string[] timeInterval =
               Regex.Matches(str, @"((1[0-2]|0?[1-9]):([0-5][0-9]) \s?([AaPp][Mm]))").Cast<Match>().Select(m => m.Value).ToArray();
 
-            foreach (var myParsedDate in result)
+            // get the date 
+            string[] getDate =
+                Regex.Matches(str, @"\d+\s[A-Za-z][A-Za-z][A-Za-z]").Cast<Match>().Select(m => m.Value).ToArray();
+
+            // converts the date to datetime then converts to string
+            var mydate = DateTime.ParseExact(getDate[0], "d MMM", CultureInfo.InvariantCulture);
+            string myNewDate = mydate.ToString();
+            string onlyDate = myNewDate.Substring(0, 9);
+
+            foreach (var myParsedDate in timeInterval)
             {
-                firstLowTide = result[0];
-                firstHighTide = result[1];
-                secondLowTide = result[2];
-                secondHighTide = result[3]; // if this is blank use tomorrows hightide date instead
+                date = onlyDate;
+                firstLowTide = timeInterval[0];
+                firstHighTide = timeInterval[1];
+                secondLowTide = timeInterval[2];
+                // if this is blank use tomorrows hightide date instead
+                // This will need to be figured out
+                secondHighTide = timeInterval[3]; 
             }
 
-            return new Tuple<string, string, string, string>(firstLowTide, firstHighTide
+            return new Tuple<string ,string, string, string, string>(date, firstLowTide, firstHighTide
                 , secondLowTide, secondHighTide);
         }
     }
