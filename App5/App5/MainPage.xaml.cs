@@ -11,6 +11,8 @@ using SQLite;
 // *****adb connect 127.0.0.1:5555*****
 
 // TODO 
+// get the next day low tide for the 3 time problem
+
 
 namespace App5
 {
@@ -61,18 +63,18 @@ namespace App5
                         secondHighTide = myResult.Item5
                     });
 
-                    await DisplayAlert("Alert", "Item have been added", "Ok");
+                    await DisplayAlert("Alert", "Item have been added", "Ok"); 
                 }
                 else
                 {
-                    await DisplayAlert("Alert", "Already there", "Ok");
+                    await DisplayAlert("Alert", "Already exist", "Ok");
                 }
             }
         }
 
 
 
-
+        // This needs to be refactored!!!!!
         public static Tuple<string, string, string, string, string> getTideData(string todaysDate) // make this so you can set the day here
         {
             // get the current date and its associated tide times [x]
@@ -101,6 +103,21 @@ namespace App5
             {
                 tideResults.Add(item.InnerText);
             }
+
+            // get *tomorrows* 1st tide 
+            int intTomorrowsDate = Int32.Parse(todaysDate) + 1;
+            string strTomorrowsDate = intTomorrowsDate.ToString();
+            List<string> tomorrowsTideResults = new List<string>();
+            var tomorrowItems = htmlDoc.DocumentNode.SelectNodes($"//div/ul/li[{strTomorrowsDate}]"); // $"//div/ul/li[{todaysDate}]/ul")
+            foreach (var item in tomorrowItems)
+            {
+                tomorrowsTideResults.Add(item.InnerText);
+            }
+
+            string strTomorrow = tomorrowsTideResults[2];
+            string[] tomorrowTimeInterval =
+              Regex.Matches(strTomorrow, @"((1[0-2]|0?[1-9]):([0-5][0-9]) \s?([AaPp][Mm]))").Cast<Match>().Select(m => m.Value).ToArray();
+
 
             // get the 4 time interval
             string str = tideResults[2];
@@ -134,6 +151,7 @@ namespace App5
                 firstLowTide = timeInterval[0];
                 firstHighTide = timeInterval[1];
                 secondLowTide = timeInterval[2];
+                secondHighTide = tomorrowTimeInterval[0];
             }
             return new Tuple<string, string, string, string, string>(date, firstLowTide, firstHighTide
                 , secondLowTide, secondHighTide);
