@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
-using System.Net.Http;
 using System.Globalization;
+using SQLite;
 
-//adb connect 127.0.0.1:5555
+// *****connect to Bluestacks*****
+// *****adb connect 127.0.0.1:5555*****
 
-/*
-iterate l
-*/
+// TODO 
 
 namespace App5
 {
     public partial class MainPage : ContentPage
     {
+        readonly SQLiteAsyncConnection _database;
         public MainPage()
         {
             InitializeComponent();
@@ -28,13 +25,13 @@ namespace App5
         async void deleteBtn(object sender, EventArgs e)
         {
             await App.Database.DeleteTideAsync<TideInformation>();
-            await DisplayAlert("Alert","All Items have been deleted","Ok");
+            
         }
 
         void saveBtn(object sender, EventArgs e)
         {
            appendToSql();
-           DisplayAlert("Alert", "All Items have been Added", "Ok");
+           
         }
 
         async void showBtn(object sender, EventArgs e)
@@ -45,24 +42,35 @@ namespace App5
         async void appendToSql()
         {
             // appends the next 5 days of data to database
-            for (int i = 1; i < 5; i++)
+            for (int i = 1; i < 6; i++)
             {
                 string iter = i.ToString();
                 var myResult = getTideData(iter);
 
-                await App.Database.SaveTideAsync(new TideInformation
+                // check if the date already exist
+                bool myReturnValue = App.Database.checkDate(myResult.Item1);
+
+                if(myReturnValue == false)
                 {
-                    date = myResult.Item1, 
-                    // check if the date already exist
+                    await App.Database.SaveTideAsync(new TideInformation
+                    {
+                        date = myResult.Item1,
+                        firstLowTide = myResult.Item2,
+                        firstHighTide = myResult.Item3,
+                        secondLowTide = myResult.Item4,
+                        secondHighTide = myResult.Item5
+                    });
 
-                    firstLowTide = myResult.Item2,
-                    firstHighTide = myResult.Item3,
-                    secondLowTide = myResult.Item4,
-                    secondHighTide = myResult.Item5
-                });
-
+                    await DisplayAlert("Alert", "Item have been added", "Ok");
+                }
+                else
+                {
+                    await DisplayAlert("Alert", "Already there", "Ok");
+                }
             }
         }
+
+
 
 
         public static Tuple<string, string, string, string, string> getTideData(string todaysDate) // make this so you can set the day here
@@ -93,6 +101,7 @@ namespace App5
             {
                 tideResults.Add(item.InnerText);
             }
+
             // get the 4 time interval
             string str = tideResults[2];
             string[] timeInterval =
@@ -107,18 +116,26 @@ namespace App5
             string myNewDate = mydate.ToString();
             string onlyDate = myNewDate.Substring(0, 9);
 
-            foreach (var myParsedDate in timeInterval)
+            //
+            if(timeInterval.Length == 4)
+            {
+                foreach (var myParsedDate in timeInterval)
+                {
+                    date = onlyDate;
+                    firstLowTide = timeInterval[0];
+                    firstHighTide = timeInterval[1];
+                    secondLowTide = timeInterval[2];
+                    secondHighTide = timeInterval[3];
+                }
+            }
+            else
             {
                 date = onlyDate;
                 firstLowTide = timeInterval[0];
                 firstHighTide = timeInterval[1];
                 secondLowTide = timeInterval[2];
-                // if this is blank use tomorrows hightide date instead
-                // This will need to be figured out
-                secondHighTide = timeInterval[3]; 
             }
-
-            return new Tuple<string ,string, string, string, string>(date, firstLowTide, firstHighTide
+            return new Tuple<string, string, string, string, string>(date, firstLowTide, firstHighTide
                 , secondLowTide, secondHighTide);
         }
     }

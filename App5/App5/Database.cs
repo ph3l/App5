@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using SQLite;
+using System.Linq;
 
 namespace App5
 {
@@ -27,6 +28,7 @@ namespace App5
         public Task<int> SaveTideAsync(TideInformation contact)
         {
             return _database.InsertAsync(contact);
+
         }
 
         // Delete registers
@@ -39,6 +41,22 @@ namespace App5
         public Task<int> UpdateTideAsync(TideInformation contact)
         {
             return _database.UpdateAsync(contact);
+        }
+
+        public bool checkDate(string myDateValue)
+        {
+            var count = _database.ExecuteScalarAsync<int>("select * from TideInformation where date=?", myDateValue);
+            // maybe prompt which value is already there
+            if (count.Result > 0)
+            {
+                // value does exist
+                return true;
+            }
+            else
+            {
+                // valued does not exist
+                return false;
+            }
         }
     }
 }
