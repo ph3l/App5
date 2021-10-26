@@ -43,6 +43,21 @@ namespace App5
             return _database.UpdateAsync(contact);
         }
 
+        public async Task<List<string>> GetListAsync()
+        {
+            DateTime thisDay = DateTime.Today;
+            string todaysDate = thisDay.ToString("dd/MM/yyyy");
+
+            List<string> outputList = new List<string>();
+            var myOutput = await _database.QueryAsync<TideInformation>("SELECT firstLowTide FROM TideInformation WHERE date = ?", "10/30/2021");
+            foreach (var s in myOutput)
+            {
+                outputList.Add(s.firstLowTide);
+            }
+            return outputList;
+        }
+
+
         public bool checkDate(string myDateValue)
         {
             var count = _database.ExecuteScalarAsync<int>("select * from TideInformation where date=?", myDateValue);

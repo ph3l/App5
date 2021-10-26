@@ -4,8 +4,9 @@
              x:Class="App5.MainPage">
 
     <StackLayout Margin="40">
-        <Button Text="Save Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="saveBtn" />
+       
         <Button Text="Delete Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="deleteBtn" />
+        <Button Text = "find Data" HorizontalOptions = "FillAndExpand" BackgroundColor = "#1690F4" TextColor = "White" Margin = "0,20" Clicked = "findBtn" />
         <Button Text="Show Data" HorizontalOptions="FillAndExpand" BackgroundColor="#1690F4" TextColor="White" Margin="0,20" Clicked="showBtn" />
         <ListView x:Name="TideInformationListView"
                       ItemsSource="{Binding Contacts}"
