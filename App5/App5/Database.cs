@@ -49,10 +49,14 @@ namespace App5
             string todaysDate = thisDay.ToString("dd/MM/yyyy");
 
             List<string> outputList = new List<string>();
-            var myOutput = await _database.QueryAsync<TideInformation>("SELECT firstLowTide FROM TideInformation WHERE date = ?", "10/30/2021");
+            var myOutput = await _database.QueryAsync<TideInformation>("SELECT firstLowTide, firstHighTide, secondLowTide, secondHighTide FROM TideInformation WHERE date = ?", "10/30/2021");
+            //var myOutput = await _database.QueryAsync<TideInformation>("SELECT * FROM TideInformation WHERE date = ? IN(firstLowTide, firstHighTide, secondLowTide, secondHighTide)", "10/30/2021");
             foreach (var s in myOutput)
             {
                 outputList.Add(s.firstLowTide);
+                outputList.Add(s.firstHighTide);
+                outputList.Add(s.secondLowTide);
+                outputList.Add(s.secondHighTide);
             }
             return outputList;
         }
